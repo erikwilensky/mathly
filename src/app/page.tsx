@@ -14,6 +14,18 @@ const TOPICS = [
     subtitle: "xᵃ·xᵇ = xᵃ⁺ᵇ",
     available: true,
   },
+  {
+    href: "/topics/radical-exponent-evaluation",
+    title: "Operation: No Calculator Allowed",
+    subtitle: "ⁿ√p = p^(1/n)",
+    available: true,
+  },
+  {
+    href: "/topics/radical-arithmetic",
+    title: "Operation: Radical Combat",
+    subtitle: "√a + √b, √a · √b, …",
+    available: true,
+  },
   { href: "#", title: "Solving Quadratic Equations", subtitle: "Next drop — not deployed yet", available: false },
   { href: "#", title: "The Quadratic Formula", subtitle: "Next drop — not deployed yet", available: false },
   { href: "#", title: "Systems of Linear Equations", subtitle: "Next drop — not deployed yet", available: false },

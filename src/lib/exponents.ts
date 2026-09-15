@@ -5,7 +5,7 @@
 // equivalence search needed (unlike factoring, where many binomial pairs
 // expand to the same polynomial).
 
-import type { Lesson, LevelId, LevelMeta } from "./levels";
+import { sup, type Lesson, type LevelId, type LevelMeta } from "./levels";
 
 export type { LevelId };
 
@@ -118,27 +118,6 @@ function nonZero(min: number, max: number): number {
   let v = 0;
   while (v === 0) v = randInt(min, max);
   return v;
-}
-
-const SUP: Record<string, string> = {
-  "0": "⁰",
-  "1": "¹",
-  "2": "²",
-  "3": "³",
-  "4": "⁴",
-  "5": "⁵",
-  "6": "⁶",
-  "7": "⁷",
-  "8": "⁸",
-  "9": "⁹",
-  "-": "⁻",
-};
-
-function sup(n: number): string {
-  return String(n)
-    .split("")
-    .map((ch) => SUP[ch] ?? ch)
-    .join("");
 }
 
 function varFactor(name: string, exp: number): string {

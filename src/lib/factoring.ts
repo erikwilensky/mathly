@@ -4,7 +4,7 @@
 // covers monic trinomials, leading-coefficient trinomials, difference of
 // squares, and GCF-first problems with one shape.
 
-import type { Lesson, LevelId, LevelMeta } from "./levels";
+import { factorsOf, type Lesson, type LevelId, type LevelMeta } from "./levels";
 
 export type { LevelId };
 
@@ -228,14 +228,6 @@ export function formatFactored(answer: FactorAnswer): string {
 }
 
 export type HintStage = 1 | 2 | 3 | 4;
-
-/** Every divisor of n, ascending, from 1 to |n|. */
-function factorsOf(n: number): number[] {
-  const abs = Math.abs(n);
-  const out: number[] = [];
-  for (let d = 1; d <= abs; d++) if (abs % d === 0) out.push(d);
-  return out;
-}
 
 /**
  * Walks the actual trial-and-error a student should do: try each divisor
