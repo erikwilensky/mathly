@@ -4,16 +4,14 @@ import { useEffect, useState } from "react";
 import {
   LEVELS,
   checkAnswer,
-  expand,
-  formatFactored,
-  formatPoly,
+  formatAnswer,
   generateProblem,
   getHint,
-  type FactorAnswer,
+  type Answer,
   type HintStage,
   type LevelId,
   type Problem,
-} from "@/lib/factoring";
+} from "@/lib/exponents";
 import { CORRECT_LINES, INCORRECT_LINES, MATH_JOKES, randomOf, streakHype } from "@/lib/humor";
 import NumberBox from "@/components/NumberBox";
 
@@ -22,17 +20,17 @@ interface Props {
   onResult: (level: LevelId, correct: boolean) => void;
 }
 
-const EMPTY_ANSWER: FactorAnswer = { k: 1, m1: 1, n1: 0, m2: 1, n2: 0 };
+const EMPTY_ANSWER: Answer = { coeff: 1, ex: 0, ey: 0 };
 
 type Feedback = { correct: boolean; message: string } | null;
 
-export default function PracticePanel({ level, onResult }: Props) {
-  // Problem starts null and is only generated client-side in an effect (not
-  // during the initial render) so server and client render the same thing
-  // on first paint — generating a random problem during render would pick a
-  // different one during SSR vs. hydration and trigger a hydration mismatch.
+export default function ExponentPracticePanel({ level, onResult }: Props) {
+  // Same deferred-generation pattern as the factoring PracticePanel: problem
+  // starts null and is only generated client-side in an effect, so server
+  // and client agree on first paint instead of hydration-mismatching on a
+  // random value.
   const [problem, setProblem] = useState<Problem | null>(null);
-  const [answer, setAnswer] = useState<FactorAnswer>(EMPTY_ANSWER);
+  const [answer, setAnswer] = useState<Answer>(EMPTY_ANSWER);
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [hintStage, setHintStage] = useState<HintStage | 0>(0);
   const [aiHint, setAiHint] = useState<string | null>(null);
@@ -61,14 +59,9 @@ export default function PracticePanel({ level, onResult }: Props) {
       setFeedback({ correct: true, message: randomOf(CORRECT_LINES) });
     } else {
       setLocalStreak(0);
-      const got = expand(answer);
       setFeedback({
         correct: false,
-        message: `${randomOf(INCORRECT_LINES)} Your factors expand to ${formatPoly(got.a, got.b, got.c)}, but the target is ${formatPoly(
-          problem.a,
-          problem.b,
-          problem.c,
-        )}.`,
+        message: `${randomOf(INCORRECT_LINES)} You entered ${formatAnswer(answer)}, but the simplified form is ${formatAnswer(problem.solution)}.`,
       });
     }
   }
@@ -99,9 +92,9 @@ export default function PracticePanel({ level, onResult }: Props) {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          poly: formatPoly(problem.a, problem.b, problem.c),
+          poly: problem.display,
           level: levelDef.name,
-          studentAttempt: formatFactored(answer),
+          studentAttempt: formatAnswer(answer),
         }),
       });
       const data = await res.json();
@@ -113,7 +106,7 @@ export default function PracticePanel({ level, onResult }: Props) {
     }
   }
 
-  const set = (patch: Partial<FactorAnswer>) => setAnswer((a) => ({ ...a, ...patch }));
+  const set = (patch: Partial<Answer>) => setAnswer((a) => ({ ...a, ...patch }));
 
   if (!problem) {
     return (
@@ -134,10 +127,10 @@ export default function PracticePanel({ level, onResult }: Props) {
         </button>
       </div>
 
-      <p className="mt-3 text-center font-mono text-2xl text-brand-ink">Target: {formatPoly(problem.a, problem.b, problem.c)}</p>
+      <p className="mt-3 text-center font-mono text-2xl text-brand-ink">Simplify: {problem.display}</p>
 
       <div className="mt-5">
-        <FactorFields level={level} answer={answer} set={set} disabled={feedback?.correct} />
+        <ExponentFields level={level} answer={answer} set={set} disabled={feedback?.correct} />
       </div>
 
       <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
@@ -224,72 +217,33 @@ export default function PracticePanel({ level, onResult }: Props) {
   );
 }
 
-function FactorFields({
+function ExponentFields({
   level,
   answer,
   set,
   disabled,
 }: {
   level: LevelId;
-  answer: FactorAnswer;
-  set: (patch: Partial<FactorAnswer>) => void;
+  answer: Answer;
+  set: (patch: Partial<Answer>) => void;
   disabled?: boolean;
 }) {
   const levelDef = LEVELS.find((l) => l.id === level)!;
   return (
-    <div className="flex flex-wrap items-center justify-center gap-2 text-xl">
-      {levelDef.showK && (
-        <>
-          <NumberBox label="GCF" value={answer.k} onChange={(k) => set({ k })} disabled={disabled} w="w-12" />
-          <span className="text-brand-ink-soft">&times;</span>
-        </>
+    <div className="flex flex-wrap items-center justify-center gap-3 text-xl">
+      {levelDef.showCoeff && <NumberBox label="coefficient" value={answer.coeff} onChange={(coeff) => set({ coeff })} w="w-14" disabled={disabled} />}
+      <div className="flex items-center gap-1 rounded-xl border border-brand-line bg-brand-panel-raised px-3 py-2">
+        <span>x</span>
+        <span className="text-brand-ink-faint">^</span>
+        <NumberBox label="x exponent" value={answer.ex} onChange={(ex) => set({ ex })} w="w-12" disabled={disabled} />
+      </div>
+      {levelDef.showY && (
+        <div className="flex items-center gap-1 rounded-xl border border-brand-line bg-brand-panel-raised px-3 py-2">
+          <span>y</span>
+          <span className="text-brand-ink-faint">^</span>
+          <NumberBox label="y exponent" value={answer.ey} onChange={(ey) => set({ ey })} w="w-12" disabled={disabled} />
+        </div>
       )}
-      <Pair
-        showM={levelDef.showM}
-        m={answer.m1}
-        n={answer.n1}
-        onM={(m1) => set({ m1 })}
-        onN={(n1) => set({ n1 })}
-        disabled={disabled}
-      />
-      <Pair
-        showM={levelDef.showM}
-        m={answer.m2}
-        n={answer.n2}
-        onM={(m2) => set({ m2 })}
-        onN={(n2) => set({ n2 })}
-        disabled={disabled}
-      />
-    </div>
-  );
-}
-
-function Pair({
-  showM,
-  m,
-  n,
-  onM,
-  onN,
-  disabled,
-}: {
-  showM: boolean;
-  m: number;
-  n: number;
-  onM: (v: number) => void;
-  onN: (v: number) => void;
-  disabled?: boolean;
-}) {
-  return (
-    <div className="flex items-center gap-1 rounded-xl border border-brand-line bg-brand-panel-raised px-3 py-2">
-      <span>(</span>
-      {showM ? (
-        <NumberBox label="x coefficient" value={m} onChange={onM} disabled={disabled} />
-      ) : (
-        <span className="px-1 text-brand-ink-soft">1</span>
-      )}
-      <span>x +</span>
-      <NumberBox label="constant" value={n} onChange={onN} disabled={disabled} />
-      <span>)</span>
     </div>
   );
 }

@@ -8,6 +8,12 @@ const TOPICS = [
     subtitle: "x² + bx + c → (x + p)(x + q)",
     available: true,
   },
+  {
+    href: "/topics/exponent-laws",
+    title: "Operation: Simplify the Exponents",
+    subtitle: "xᵃ·xᵇ = xᵃ⁺ᵇ",
+    available: true,
+  },
   { href: "#", title: "Solving Quadratic Equations", subtitle: "Next drop — not deployed yet", available: false },
   { href: "#", title: "The Quadratic Formula", subtitle: "Next drop — not deployed yet", available: false },
   { href: "#", title: "Systems of Linear Equations", subtitle: "Next drop — not deployed yet", available: false },
@@ -19,7 +25,7 @@ export default function HomePage() {
       <p className="text-sm font-semibold uppercase tracking-widest text-brand-indigo">Algebra I, apparently</p>
       <Greeting />
       <p className="mt-2 max-w-xl text-brand-ink-soft">
-        Short lessons, worked examples, and practice with instant feedback — pick a topic and let's ruin some quadratics.
+        Short lessons, worked examples, and practice with instant feedback — pick a mission and let's ruin some algebra.
       </p>
 
       <div className="mt-8 grid gap-3 sm:grid-cols-2">

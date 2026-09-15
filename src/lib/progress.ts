@@ -1,9 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { LevelId } from "./factoring";
+import type { LevelId } from "./levels";
 
-const STORAGE_KEY = "mathly.factoring-quadratics.v1";
 const UNLOCK_THRESHOLD = 5;
 
 export interface TopicProgress {
@@ -26,10 +25,14 @@ function defaultProgress(): TopicProgress {
   };
 }
 
-function load(): TopicProgress {
+function storageKey(topicId: string): string {
+  return `mathly.${topicId}.v1`;
+}
+
+function load(topicId: string): TopicProgress {
   if (typeof window === "undefined") return defaultProgress();
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(storageKey(topicId));
     if (!raw) return defaultProgress();
     const parsed = JSON.parse(raw) as TopicProgress;
     return { ...defaultProgress(), ...parsed };
@@ -38,21 +41,22 @@ function load(): TopicProgress {
   }
 }
 
-function save(progress: TopicProgress) {
+function save(topicId: string, progress: TopicProgress) {
   if (typeof window === "undefined") return;
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    window.localStorage.setItem(storageKey(topicId), JSON.stringify(progress));
   } catch {
     // localStorage unavailable (private browsing, etc.) — progress just won't persist.
   }
 }
 
-export function useProgress() {
+/** topicId keys the localStorage entry, e.g. "factoring-quadratics" — keep it stable per topic or progress resets. */
+export function useProgress(topicId: string) {
   const [progress, setProgress] = useState<TopicProgress>(defaultProgress);
 
   useEffect(() => {
-    setProgress(load());
-  }, []);
+    setProgress(load(topicId));
+  }, [topicId]);
 
   const recordAttempt = useCallback((level: LevelId, correct: boolean) => {
     setProgress((prev) => {
@@ -79,10 +83,10 @@ export function useProgress() {
       } else {
         next.streak = 0;
       }
-      save(next);
+      save(topicId, next);
       return next;
     });
-  }, []);
+  }, [topicId]);
 
   const isUnlocked = useCallback((level: LevelId) => progress.unlockedLevels.includes(level), [progress]);
 

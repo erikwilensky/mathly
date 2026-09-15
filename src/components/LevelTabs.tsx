@@ -1,8 +1,9 @@
 "use client";
 
-import { LEVELS, type LevelId } from "@/lib/factoring";
+import type { LevelId, LevelMeta } from "@/lib/levels";
 
 interface Props {
+  levels: LevelMeta[];
   active: LevelId;
   onSelect: (level: LevelId) => void;
   isUnlocked: (level: LevelId) => boolean;
@@ -25,10 +26,10 @@ function difficultyStyle(difficulty: string): string {
   }
 }
 
-export default function LevelTabs({ active, onSelect, isUnlocked, correctByLevel, unlockThreshold }: Props) {
+export default function LevelTabs({ levels, active, onSelect, isUnlocked, correctByLevel, unlockThreshold }: Props) {
   return (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-      {LEVELS.map((lvl) => {
+      {levels.map((lvl) => {
         const unlocked = isUnlocked(lvl.id);
         const isActive = active === lvl.id;
         return (

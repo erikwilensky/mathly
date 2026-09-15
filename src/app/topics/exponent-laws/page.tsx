@@ -2,15 +2,15 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import ExponentPracticePanel from "@/components/ExponentPracticePanel";
 import LearnPanel from "@/components/LearnPanel";
 import LevelTabs from "@/components/LevelTabs";
-import PracticePanel from "@/components/PracticePanel";
-import { FACTORING_LESSONS, LEVELS, type LevelId } from "@/lib/factoring";
+import { EXPONENT_LESSONS, LEVELS, type LevelId } from "@/lib/exponents";
 import { useProgress } from "@/lib/progress";
 
-export default function FactoringQuadraticsPage() {
+export default function ExponentLawsPage() {
   const [level, setLevel] = useState<LevelId>(1);
-  const { progress, recordAttempt, isUnlocked, unlockThreshold } = useProgress("factoring-quadratics");
+  const { progress, recordAttempt, isUnlocked, unlockThreshold } = useProgress("exponent-laws");
   const levelDef = LEVELS.find((l) => l.id === level)!;
 
   return (
@@ -21,8 +21,8 @@ export default function FactoringQuadraticsPage() {
 
       <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-brand-ink sm:text-3xl">Operation: Factor the Quadratics</h1>
-          <p className="mt-1 text-sm text-brand-ink-soft">Learn the method, then practice until it clicks. For Democracy, Russell.</p>
+          <h1 className="text-2xl font-bold text-brand-ink sm:text-3xl">Operation: Simplify the Exponents</h1>
+          <p className="mt-1 text-sm text-brand-ink-soft">Learn the exponent laws, then drill them until they're automatic. For Democracy, Russell.</p>
         </div>
         <div className="flex gap-4 text-right">
           <div>
@@ -48,8 +48,8 @@ export default function FactoringQuadraticsPage() {
       </div>
 
       <div className="mt-6 grid gap-6">
-        <LearnPanel key={`learn-${level}`} level={level} lessons={FACTORING_LESSONS} />
-        <PracticePanel key={`practice-${level}`} level={level} onResult={recordAttempt} />
+        <LearnPanel key={`learn-${level}`} level={level} lessons={EXPONENT_LESSONS} />
+        <ExponentPracticePanel key={`practice-${level}`} level={level} onResult={recordAttempt} />
       </div>
 
       <p className="mt-6 text-center text-xs text-brand-ink-faint">
