@@ -10,6 +10,21 @@ interface Props {
   unlockThreshold: number;
 }
 
+function difficultyStyle(difficulty: string): string {
+  switch (difficulty) {
+    case "Trivial":
+      return "bg-brand-green/15 text-brand-green";
+    case "Challenging":
+      return "bg-brand-gold/15 text-brand-gold";
+    case "Extreme":
+      return "bg-orange-500/15 text-orange-400";
+    case "Helldive":
+      return "bg-brand-red/15 text-brand-red";
+    default:
+      return "bg-brand-line/40 text-brand-ink-faint";
+  }
+}
+
 export default function LevelTabs({ active, onSelect, isUnlocked, correctByLevel, unlockThreshold }: Props) {
   return (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -33,15 +48,18 @@ export default function LevelTabs({ active, onSelect, isUnlocked, correctByLevel
               <span>Level {lvl.id}</span>
               {!unlocked && <span>&#128274;</span>}
             </div>
-            <div className="text-sm font-semibold text-brand-ink">{lvl.name}</div>
+            <div className={`mt-0.5 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${difficultyStyle(lvl.difficulty)}`}>
+              {lvl.difficulty}
+            </div>
+            <div className="mt-1 text-sm font-semibold text-brand-ink">{lvl.name}</div>
             <div className="font-mono text-xs text-brand-ink-soft">{lvl.subtitle}</div>
             {!unlocked && (
               <div className="mt-1 text-[11px] text-brand-ink-faint">
-                Get {unlockThreshold} correct at Level {lvl.id - 1} to unlock
+                {unlockThreshold} confirmed kills at Level {lvl.id - 1} to deploy here
               </div>
             )}
             {unlocked && (
-              <div className="mt-1 text-[11px] text-brand-ink-faint">{correctByLevel[lvl.id]} solved</div>
+              <div className="mt-1 text-[11px] text-brand-ink-faint">{correctByLevel[lvl.id]} confirmed kills</div>
             )}
           </button>
         );

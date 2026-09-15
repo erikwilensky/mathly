@@ -13,13 +13,47 @@ export interface Level {
   pattern: string;
   showK: boolean;
   showM: boolean;
+  /** Helldivers-style difficulty tier, purely for flavor. */
+  difficulty: string;
 }
 
 export const LEVELS: Level[] = [
-  { id: 1, name: "Basic Trinomials", subtitle: "x² + bx + c", pattern: "(x + _)(x + _)", showK: false, showM: false },
-  { id: 2, name: "Leading Coefficient", subtitle: "ax² + bx + c", pattern: "(_x + _)(_x + _)", showK: false, showM: true },
-  { id: 3, name: "Difference of Squares", subtitle: "a²x² − b²", pattern: "(_x + _)(_x + _)", showK: false, showM: true },
-  { id: 4, name: "GCF First", subtitle: "k(ax² + bx + c)", pattern: "_(_x + _)(_x + _)", showK: true, showM: true },
+  {
+    id: 1,
+    name: "Basic Trinomials",
+    subtitle: "x² + bx + c",
+    pattern: "(x + _)(x + _)",
+    showK: false,
+    showM: false,
+    difficulty: "Trivial",
+  },
+  {
+    id: 2,
+    name: "Leading Coefficient",
+    subtitle: "ax² + bx + c",
+    pattern: "(_x + _)(_x + _)",
+    showK: false,
+    showM: true,
+    difficulty: "Challenging",
+  },
+  {
+    id: 3,
+    name: "Difference of Squares",
+    subtitle: "a²x² − b²",
+    pattern: "(_x + _)(_x + _)",
+    showK: false,
+    showM: true,
+    difficulty: "Extreme",
+  },
+  {
+    id: 4,
+    name: "GCF First",
+    subtitle: "k(ax² + bx + c)",
+    pattern: "_(_x + _)(_x + _)",
+    showK: true,
+    showM: true,
+    difficulty: "Helldive",
+  },
 ];
 
 export interface Problem {

@@ -16,22 +16,22 @@ export default function FactoringQuadraticsPage() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-8 sm:py-12">
       <Link href="/" className="text-sm text-brand-ink-faint hover:text-brand-ink-soft">
-        &larr; All topics
+        &larr; Back to Super Earth
       </Link>
 
       <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-brand-ink sm:text-3xl">Factoring Quadratic Expressions</h1>
-          <p className="mt-1 text-sm text-brand-ink-soft">Learn the method, then practice until it clicks.</p>
+          <h1 className="text-2xl font-bold text-brand-ink sm:text-3xl">Operation: Factor the Quadratics</h1>
+          <p className="mt-1 text-sm text-brand-ink-soft">Learn the method, then practice until it clicks. For Democracy, Russell.</p>
         </div>
         <div className="flex gap-4 text-right">
           <div>
             <div className="text-lg font-bold text-brand-gold">{progress.xp}</div>
-            <div className="text-[11px] uppercase tracking-wide text-brand-ink-faint">XP</div>
+            <div className="text-[11px] uppercase tracking-wide text-brand-ink-faint">Medals</div>
           </div>
           <div>
             <div className="text-lg font-bold text-brand-teal">{progress.streak}</div>
-            <div className="text-[11px] uppercase tracking-wide text-brand-ink-faint">Streak</div>
+            <div className="text-[11px] uppercase tracking-wide text-brand-ink-faint">Kill Streak</div>
           </div>
         </div>
       </div>
@@ -52,7 +52,7 @@ export default function FactoringQuadraticsPage() {
       </div>
 
       <p className="mt-6 text-center text-xs text-brand-ink-faint">
-        {levelDef.name}: get {unlockThreshold} correct to unlock the next level.
+        {levelDef.name} ({levelDef.difficulty}): get {unlockThreshold} confirmed kills to unlock the next difficulty tier.
       </p>
     </main>
   );

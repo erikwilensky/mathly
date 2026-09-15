@@ -26,7 +26,11 @@ const EMPTY_ANSWER: FactorAnswer = { k: 1, m1: 1, n1: 0, m2: 1, n2: 0 };
 type Feedback = { correct: boolean; message: string } | null;
 
 export default function PracticePanel({ level, onResult }: Props) {
-  const [problem, setProblem] = useState<Problem>(() => generateProblem(level));
+  // Problem starts null and is only generated client-side in an effect (not
+  // during the initial render) so server and client render the same thing
+  // on first paint — generating a random problem during render would pick a
+  // different one during SSR vs. hydration and trigger a hydration mismatch.
+  const [problem, setProblem] = useState<Problem | null>(null);
   const [answer, setAnswer] = useState<FactorAnswer>(EMPTY_ANSWER);
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [hintStage, setHintStage] = useState<HintStage | 0>(0);
@@ -41,11 +45,13 @@ export default function PracticePanel({ level, onResult }: Props) {
     setFeedback(null);
     setHintStage(0);
     setAiHint(null);
+    setJoke(null);
   }, [level]);
 
   const levelDef = LEVELS.find((l) => l.id === level)!;
 
   function handleCheck() {
+    if (!problem) return;
     const correct = checkAnswer(problem, answer);
     onResult(level, correct);
     setJoke(null);
@@ -84,6 +90,7 @@ export default function PracticePanel({ level, onResult }: Props) {
   }
 
   async function askAiTutor() {
+    if (!problem) return;
     setAiLoading(true);
     setAiHint(null);
     try {
@@ -107,16 +114,26 @@ export default function PracticePanel({ level, onResult }: Props) {
 
   const set = (patch: Partial<FactorAnswer>) => setAnswer((a) => ({ ...a, ...patch }));
 
+  if (!problem) {
+    return (
+      <div className="rounded-2xl border border-brand-line bg-brand-panel p-5">
+        <p className="text-center text-sm text-brand-ink-faint">Loading drop pod&hellip;</p>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-2xl border border-brand-line bg-brand-panel p-5">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold uppercase tracking-wide text-brand-ink-faint">Practice &middot; {levelDef.name}</span>
+        <span className="text-xs font-semibold uppercase tracking-wide text-brand-ink-faint">
+          Mission &middot; {levelDef.name} <span className="text-brand-ink-faint/70">({levelDef.difficulty})</span>
+        </span>
         <button onClick={nextProblem} className="text-xs text-brand-ink-faint underline decoration-dotted hover:text-brand-ink-soft">
-          skip
+          abort mission
         </button>
       </div>
 
-      <p className="mt-3 text-center font-mono text-2xl text-brand-ink">Factor: {formatPoly(problem.a, problem.b, problem.c)}</p>
+      <p className="mt-3 text-center font-mono text-2xl text-brand-ink">Target: {formatPoly(problem.a, problem.b, problem.c)}</p>
 
       <div className="mt-5">
         <FactorFields level={level} answer={answer} set={set} disabled={feedback?.correct} />
@@ -128,7 +145,7 @@ export default function PracticePanel({ level, onResult }: Props) {
             onClick={handleCheck}
             className="rounded-lg bg-brand-indigo px-5 py-2 text-sm font-semibold text-white transition hover:bg-brand-indigo/85"
           >
-            Check answer
+            Deploy &#128640;
           </button>
         )}
         {feedback?.correct && (
@@ -136,7 +153,7 @@ export default function PracticePanel({ level, onResult }: Props) {
             onClick={nextProblem}
             className="rounded-lg bg-brand-green px-5 py-2 text-sm font-semibold text-brand-bg transition hover:bg-brand-green/85"
           >
-            Next problem &rarr;
+            Next mission &rarr;
           </button>
         )}
         {!feedback?.correct && (
@@ -145,7 +162,7 @@ export default function PracticePanel({ level, onResult }: Props) {
             disabled={hintStage >= 3}
             className="rounded-lg border border-brand-line px-4 py-2 text-sm font-semibold text-brand-ink-soft transition hover:border-brand-gold hover:text-brand-gold disabled:opacity-40"
           >
-            {hintStage === 0 ? "Get a hint" : "Next hint"}
+            {hintStage === 0 ? "Request intel" : "More intel"}
           </button>
         )}
         {!feedback?.correct && (
@@ -154,14 +171,14 @@ export default function PracticePanel({ level, onResult }: Props) {
             disabled={aiLoading}
             className="rounded-lg border border-brand-line px-4 py-2 text-sm font-semibold text-brand-ink-soft transition hover:border-brand-teal hover:text-brand-teal disabled:opacity-40"
           >
-            {aiLoading ? "Asking AI…" : "Ask AI tutor"}
+            {aiLoading ? "Contacting Super Earth…" : "Call Command AI"}
           </button>
         )}
         <button
           onClick={tellJoke}
           className="rounded-lg border border-brand-line px-4 py-2 text-sm font-semibold text-brand-ink-soft transition hover:border-pink-400 hover:text-pink-400"
         >
-          Make me laugh
+          Morale boost
         </button>
       </div>
 
@@ -185,12 +202,16 @@ export default function PracticePanel({ level, onResult }: Props) {
 
       {hintStage > 0 && (
         <div className="mt-3 rounded-xl border border-brand-gold/30 bg-brand-gold/10 px-4 py-3 text-sm text-brand-gold">
+          <span className="mr-1 font-bold uppercase tracking-wide">Intel report:</span>
           {getHint(problem, hintStage as HintStage)}
         </div>
       )}
 
       {aiHint && (
-        <div className="mt-3 rounded-xl border border-brand-teal/30 bg-brand-teal/10 px-4 py-3 text-sm text-brand-teal">{aiHint}</div>
+        <div className="mt-3 rounded-xl border border-brand-teal/30 bg-brand-teal/10 px-4 py-3 text-sm text-brand-teal">
+          <span className="mr-1 font-bold uppercase tracking-wide">Command AI:</span>
+          {aiHint}
+        </div>
       )}
 
       {joke && (
