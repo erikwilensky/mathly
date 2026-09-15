@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Mathly — Learn Algebra",
-  description: "Interactive algebra lessons and practice.",
+  title: "Mathly — Russell vs. Algebra",
+  description: "Interactive algebra lessons and practice, built for one very specific 16-year-old.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

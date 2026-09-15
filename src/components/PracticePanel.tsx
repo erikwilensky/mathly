@@ -14,6 +14,7 @@ import {
   type LevelId,
   type Problem,
 } from "@/lib/factoring";
+import { CORRECT_LINES, INCORRECT_LINES, MATH_JOKES, randomOf, streakHype } from "@/lib/humor";
 
 interface Props {
   level: LevelId;
@@ -31,6 +32,8 @@ export default function PracticePanel({ level, onResult }: Props) {
   const [hintStage, setHintStage] = useState<HintStage | 0>(0);
   const [aiHint, setAiHint] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const [joke, setJoke] = useState<string | null>(null);
+  const [localStreak, setLocalStreak] = useState(0);
 
   useEffect(() => {
     setProblem(generateProblem(level));
@@ -45,13 +48,16 @@ export default function PracticePanel({ level, onResult }: Props) {
   function handleCheck() {
     const correct = checkAnswer(problem, answer);
     onResult(level, correct);
+    setJoke(null);
     if (correct) {
-      setFeedback({ correct: true, message: "Correct! That expands right back to the original expression." });
+      setLocalStreak((s) => s + 1);
+      setFeedback({ correct: true, message: randomOf(CORRECT_LINES) });
     } else {
+      setLocalStreak(0);
       const got = expand(answer);
       setFeedback({
         correct: false,
-        message: `Not quite. Your factors expand to ${formatPoly(got.a, got.b, got.c)}, but the target is ${formatPoly(
+        message: `${randomOf(INCORRECT_LINES)} Your factors expand to ${formatPoly(got.a, got.b, got.c)}, but the target is ${formatPoly(
           problem.a,
           problem.b,
           problem.c,
@@ -66,6 +72,11 @@ export default function PracticePanel({ level, onResult }: Props) {
     setFeedback(null);
     setHintStage(0);
     setAiHint(null);
+    setJoke(null);
+  }
+
+  function tellJoke() {
+    setJoke(randomOf(MATH_JOKES));
   }
 
   function revealNextHint() {
@@ -146,6 +157,12 @@ export default function PracticePanel({ level, onResult }: Props) {
             {aiLoading ? "Asking AI…" : "Ask AI tutor"}
           </button>
         )}
+        <button
+          onClick={tellJoke}
+          className="rounded-lg border border-brand-line px-4 py-2 text-sm font-semibold text-brand-ink-soft transition hover:border-pink-400 hover:text-pink-400"
+        >
+          Make me laugh
+        </button>
       </div>
 
       {feedback && (
@@ -160,6 +177,12 @@ export default function PracticePanel({ level, onResult }: Props) {
         </div>
       )}
 
+      {feedback?.correct && localStreak >= 3 && streakHype(localStreak) && (
+        <div className="mt-3 animate-pop rounded-xl border border-brand-gold/30 bg-brand-gold/10 px-4 py-3 text-center text-sm font-semibold text-brand-gold">
+          {streakHype(localStreak)}
+        </div>
+      )}
+
       {hintStage > 0 && (
         <div className="mt-3 rounded-xl border border-brand-gold/30 bg-brand-gold/10 px-4 py-3 text-sm text-brand-gold">
           {getHint(problem, hintStage as HintStage)}
@@ -168,6 +191,12 @@ export default function PracticePanel({ level, onResult }: Props) {
 
       {aiHint && (
         <div className="mt-3 rounded-xl border border-brand-teal/30 bg-brand-teal/10 px-4 py-3 text-sm text-brand-teal">{aiHint}</div>
+      )}
+
+      {joke && (
+        <div className="mt-3 animate-pop rounded-xl border border-pink-400/30 bg-pink-400/10 px-4 py-3 text-center text-sm text-pink-300">
+          {joke}
+        </div>
       )}
     </div>
   );

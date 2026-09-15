@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { GREETINGS, randomOf } from "@/lib/humor";
 
 const TOPICS = [
   {
@@ -15,10 +16,10 @@ const TOPICS = [
 export default function HomePage() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-10 sm:py-16">
-      <p className="text-sm font-semibold uppercase tracking-widest text-brand-indigo">Algebra I</p>
-      <h1 className="mt-1 text-3xl font-bold text-brand-ink sm:text-4xl">Mathly</h1>
+      <p className="text-sm font-semibold uppercase tracking-widest text-brand-indigo">Algebra I, apparently</p>
+      <h1 className="mt-1 text-3xl font-bold text-brand-ink sm:text-4xl">{randomOf(GREETINGS)}</h1>
       <p className="mt-2 max-w-xl text-brand-ink-soft">
-        Short lessons, worked examples, and practice with instant feedback — pick a topic to get started.
+        Short lessons, worked examples, and practice with instant feedback — pick a topic and let's ruin some quadratics.
       </p>
 
       <div className="mt-8 grid gap-3 sm:grid-cols-2">
