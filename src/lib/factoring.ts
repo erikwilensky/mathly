@@ -56,40 +56,45 @@ export const LEVELS: Level[] = [
 export const FACTORING_LESSONS: Record<LevelId, Lesson> = {
   1: {
     intro:
-      "For x² + bx + c, you're looking for two numbers that multiply to c and add to b. Those two numbers become the constants in your two binomials.",
+      "For x² + bx + c, you're looking for two numbers that multiply to c and add to b. Those two numbers become the constants in your two binomials. If you can't just see them, list the factor pairs of c and test each one — that always works.",
     steps: [
       { text: "Start with the trinomial.", math: "x² + 5x + 6" },
-      { text: "List factor pairs of c = 6, and check which pair adds to b = 5.", math: "1×6, 2×3 → 2 + 3 = 5 ✓" },
+      { text: "List the factor pairs of c = 6.", math: "1 × 6,   2 × 3" },
+      { text: "Test the first pair: does it add to b = 5?", math: "1 + 6 = 7 — nope, not this one" },
+      { text: "Test the next pair: does it add to b = 5?", math: "2 + 3 = 5 ✓ found it" },
       { text: "Use that pair (2 and 3) as the constants in the two binomials.", math: "(x + 2)(x + 3)" },
       { text: "Check by expanding — it should rebuild the original trinomial.", math: "x² + 3x + 2x + 6 = x² + 5x + 6 ✓" },
     ],
   },
   2: {
     intro:
-      "When a ≠ 1, multiply a×c first. Find two numbers that multiply to a×c and add to b, use them to split the middle term into two terms, then factor by grouping.",
+      "When a ≠ 1, multiply a×c first. Find two numbers that multiply to a×c and add to b (same trial-and-error as Level 1, just with a×c instead of c), use them to split the middle term into two terms, then factor by grouping.",
     steps: [
       { text: "Start with the trinomial.", math: "2x² + 7x + 3" },
-      { text: "Multiply a×c = 2×3 = 6. Find two numbers that multiply to 6 and add to b = 7.", math: "1×6 → 1 + 6 = 7 ✓" },
-      { text: "Split the middle term 7x into 1x + 6x.", math: "2x² + 1x + 6x + 3" },
+      { text: "Multiply a and c.", math: "a × c = 2 × 3 = 6" },
+      { text: "List the factor pairs of 6 and test each against b = 7.", math: "1 × 6 → 1 + 6 = 7 ✓ found it" },
+      { text: "Split the middle term 7x into 1x + 6x, using those two numbers.", math: "2x² + 1x + 6x + 3" },
       { text: "Group in pairs and factor each pair.", math: "x(2x + 1) + 3(2x + 1)" },
       { text: "Factor out the common binomial.", math: "(2x + 1)(x + 3)" },
     ],
   },
   3: {
     intro:
-      "A difference of squares A² − B² always factors as (A − B)(A + B) — no middle term, so there's nothing to split. Just find the two square roots.",
+      "A difference of squares A² − B² always factors as (A − B)(A + B) — no middle term, so there's nothing to split. Just confirm both terms are perfect squares and find their roots.",
     steps: [
       { text: "Start with the binomial.", math: "9x² − 16" },
-      { text: "Recognize both terms as perfect squares.", math: "9x² = (3x)²,  16 = 4²" },
+      { text: "Is the first term a perfect square? Find its square root.", math: "9x² = (3x)² — yes, √9 = 3" },
+      { text: "Is the second term a perfect square? Find its square root.", math: "16 = 4² — yes, √16 = 4" },
       { text: "Apply A² − B² = (A − B)(A + B) with A = 3x, B = 4.", math: "(3x − 4)(3x + 4)" },
     ],
   },
   4: {
     intro:
-      "Always check for a greatest common factor first. Pull it out front, then factor whatever trinomial is left using the Level 1 or Level 2 method.",
+      "Always check for a greatest common factor first. If you can't spot it immediately, list the factors of each coefficient and pick the largest one they all share, then factor whatever trinomial is left using the Level 1 or Level 2 method.",
     steps: [
       { text: "Start with the trinomial.", math: "4x² + 20x + 24" },
-      { text: "Find the GCF of 4, 20, and 24.", math: "GCF = 4" },
+      { text: "List the factors of each coefficient.", math: "4: 1, 2, 4    20: 1, 2, 4, 5, 10, 20    24: 1, 2, 3, 4, 6, 8, 12, 24" },
+      { text: "Find the largest factor common to all three.", math: "GCF = 4" },
       { text: "Factor it out.", math: "4(x² + 5x + 6)" },
       { text: "Factor the remaining trinomial like Level 1.", math: "4(x + 2)(x + 3)" },
     ],
@@ -222,30 +227,67 @@ export function formatFactored(answer: FactorAnswer): string {
   return `${kPart}${binomialString(answer.m1, answer.n1)}${binomialString(answer.m2, answer.n2)}`;
 }
 
-export type HintStage = 1 | 2 | 3;
+export type HintStage = 1 | 2 | 3 | 4;
+
+/** Every divisor of n, ascending, from 1 to |n|. */
+function factorsOf(n: number): number[] {
+  const abs = Math.abs(n);
+  const out: number[] = [];
+  for (let d = 1; d <= abs; d++) if (abs % d === 0) out.push(d);
+  return out;
+}
+
+/**
+ * Walks the actual trial-and-error a student should do: try each divisor
+ * pair of `product`, sign-matched to it, and stop at the one summing to
+ * `sum` — this is the sub-step under "find two numbers that multiply to X
+ * and add to Y" for a student who doesn't know how to search for them.
+ */
+function factorPairChecklist(product: number, sum: number): string {
+  const absP = Math.abs(product);
+  const lines: string[] = [];
+  for (let d = 1; d * d <= absP; d++) {
+    if (absP % d !== 0) continue;
+    const other = absP / d;
+    const candidates: Array<[number, number]> = product >= 0 ? [[d, other], [-d, -other]] : [[d, -other], [-d, other]];
+    const match = candidates.find(([p, q]) => p + q === sum);
+    const [p, q] = match ?? candidates[0]!;
+    const ok = match !== undefined;
+    lines.push(`${p} × ${q} → sum = ${p + q}${ok ? " ✓ that's it" : ""}`);
+    if (ok) break;
+  }
+  return lines.join(", then ");
+}
 
 export function getHint(problem: Problem, stage: HintStage): string {
   const { level, a, b, c, solution } = problem;
   if (level === 1) {
     if (stage === 1) return "Find two numbers that multiply to c and add to b.";
     if (stage === 2) return `You need two numbers that multiply to ${c} and add to ${b}.`;
+    if (stage === 3) return `Stuck on which two numbers those are? Try the divisor pairs of ${c} one at a time: ${factorPairChecklist(c, b)}.`;
     return `Those numbers are ${solution.n1} and ${solution.n2}, so it factors as ${formatFactored(solution)}.`;
   }
   if (level === 2) {
     const ac = a * c;
     if (stage === 1) return "Multiply a and c, then find two numbers that multiply to a×c and add to b. Use them to split the middle term and factor by grouping.";
     if (stage === 2) return `a×c = ${ac}. Find two numbers that multiply to ${ac} and add to ${b}, then rewrite ${formatPoly(a, b, c)} using those two terms in place of ${b}x.`;
+    if (stage === 3) return `Stuck on which two numbers those are? Try the divisor pairs of ${ac} one at a time: ${factorPairChecklist(ac, b)}.`;
     return `Split the middle term and group: it factors as ${formatFactored(solution)}.`;
   }
   if (level === 3) {
     const m = solution.m1;
     const n = solution.n2;
     if (stage === 1) return "This is a difference of squares: A² − B² = (A − B)(A + B). Find the square roots of the two terms.";
-    if (stage === 2) return `√${a} = ${m}x and √${Math.abs(c)} = ${n}, so A = ${m}x and B = ${n}.`;
+    if (stage === 2) return `You need √${a} and √${Math.abs(c)} — what are they?`;
+    if (stage === 3) return `Check: ${m}² = ${m * m} (that's a ✓), and ${n}² = ${n * n} (that's |c| ✓). So A = ${m}x and B = ${n}.`;
     return `It factors as ${formatFactored(solution)}.`;
   }
   // level 4
+  const fa = factorsOf(a);
+  const fb = factorsOf(b);
+  const fc = factorsOf(c);
   if (stage === 1) return "First pull out the greatest common factor of all three terms, then factor the remaining trinomial.";
-  if (stage === 2) return `The GCF of ${a}, ${b}, and ${c} is ${solution.k}. After factoring it out you get ${solution.k}(${formatPoly(a / solution.k, b / solution.k, c / solution.k)}).`;
-  return `It factors as ${formatFactored(solution)}.`;
+  if (stage === 2) return `Find the greatest number that divides evenly into all of ${a}, ${b}, and ${c}.`;
+  if (stage === 3) return `Factors of ${a}: ${fa.join(", ")}. Factors of ${b}: ${fb.join(", ")}. Factors of ${c}: ${fc.join(", ")}. The largest one common to all three is the GCF.`;
+  return `The GCF is ${solution.k}. After factoring it out you get ${solution.k}(${formatPoly(a / solution.k, b / solution.k, c / solution.k)}), which factors as ${formatFactored(solution)}.`;
 }

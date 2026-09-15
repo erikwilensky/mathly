@@ -87,7 +87,7 @@ export default function PracticePanel({ level, onResult }: Props) {
   }
 
   function revealNextHint() {
-    setHintStage((s) => (s >= 3 ? 3 : ((s + 1) as HintStage)));
+    setHintStage((s) => (s >= 4 ? 4 : ((s + 1) as HintStage)));
   }
 
   async function askAiTutor() {
@@ -160,7 +160,7 @@ export default function PracticePanel({ level, onResult }: Props) {
         {!feedback?.correct && (
           <button
             onClick={revealNextHint}
-            disabled={hintStage >= 3}
+            disabled={hintStage >= 4}
             className="rounded-lg border border-brand-line px-4 py-2 text-sm font-semibold text-brand-ink-soft transition hover:border-brand-gold hover:text-brand-gold disabled:opacity-40"
           >
             {hintStage === 0 ? "Request intel" : "More intel"}
