@@ -1,35 +1,6 @@
 import Link from "next/link";
 import Greeting from "@/components/Greeting";
-
-const TOPICS = [
-  {
-    href: "/topics/factoring-quadratics",
-    title: "Operation: Factor the Quadratics",
-    subtitle: "x² + bx + c → (x + p)(x + q)",
-    available: true,
-  },
-  {
-    href: "/topics/exponent-laws",
-    title: "Operation: Simplify the Exponents",
-    subtitle: "xᵃ·xᵇ = xᵃ⁺ᵇ",
-    available: true,
-  },
-  {
-    href: "/topics/radical-exponent-evaluation",
-    title: "Operation: No Calculator Allowed",
-    subtitle: "ⁿ√p = p^(1/n)",
-    available: true,
-  },
-  {
-    href: "/topics/radical-arithmetic",
-    title: "Operation: Radical Combat",
-    subtitle: "√a + √b, √a · √b, …",
-    available: true,
-  },
-  { href: "#", title: "Solving Quadratic Equations", subtitle: "Next drop — not deployed yet", available: false },
-  { href: "#", title: "The Quadratic Formula", subtitle: "Next drop — not deployed yet", available: false },
-  { href: "#", title: "Systems of Linear Equations", subtitle: "Next drop — not deployed yet", available: false },
-];
+import { COMING_SOON, TOPICS } from "@/lib/topics";
 
 export default function HomePage() {
   return (
@@ -40,21 +11,29 @@ export default function HomePage() {
         Short lessons, worked examples, and practice with instant feedback — pick a mission and let's ruin some algebra.
       </p>
 
+      <Link
+        href="/map"
+        className="mt-5 inline-flex items-center gap-2 rounded-xl border border-brand-indigo/40 bg-brand-indigo/10 px-4 py-2 text-sm font-semibold text-brand-indigo transition hover:bg-brand-indigo/20"
+      >
+        🗺️ View Campaign Map
+      </Link>
+
       <div className="mt-8 grid gap-3 sm:grid-cols-2">
         {TOPICS.map((t) => (
           <Link
-            key={t.title}
+            key={t.id}
             href={t.href}
-            aria-disabled={!t.available}
-            className={`rounded-2xl border p-5 transition ${
-              t.available
-                ? "border-brand-line bg-brand-panel hover:border-brand-indigo/60 hover:bg-brand-panel-raised"
-                : "pointer-events-none border-brand-line/50 bg-brand-panel/40 opacity-50"
-            }`}
+            className="rounded-2xl border border-brand-line bg-brand-panel p-5 transition hover:border-brand-indigo/60 hover:bg-brand-panel-raised"
           >
             <div className="text-base font-semibold text-brand-ink">{t.title}</div>
             <div className="mt-1 font-mono text-sm text-brand-ink-soft">{t.subtitle}</div>
           </Link>
+        ))}
+        {COMING_SOON.map((t) => (
+          <div key={t.title} className="pointer-events-none rounded-2xl border border-brand-line/50 bg-brand-panel/40 p-5 opacity-50">
+            <div className="text-base font-semibold text-brand-ink">{t.title}</div>
+            <div className="mt-1 font-mono text-sm text-brand-ink-soft">{t.subtitle}</div>
+          </div>
         ))}
       </div>
     </main>

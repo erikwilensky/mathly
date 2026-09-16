@@ -25,8 +25,15 @@ function defaultProgress(): TopicProgress {
   };
 }
 
+export { UNLOCK_THRESHOLD };
+
 function storageKey(topicId: string): string {
   return `mathly.${topicId}.v1`;
+}
+
+/** Read a topic's progress without subscribing to it as a hook would — for read-only overviews (e.g. the campaign map) that list every topic at once. */
+export function loadTopicProgress(topicId: string): TopicProgress {
+  return load(topicId);
 }
 
 function load(topicId: string): TopicProgress {
