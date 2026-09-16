@@ -56,3 +56,25 @@ export function gcd(a: number, b: number): number {
   while (b) [a, b] = [b, a % b];
   return a || 1;
 }
+
+export interface Fraction {
+  num: number;
+  den: number;
+}
+
+/** Reduces num/den to lowest terms with a positive denominator. */
+export function reduceFraction(num: number, den: number): Fraction {
+  if (den < 0) {
+    num = -num;
+    den = -den;
+  }
+  if (num === 0) return { num: 0, den: 1 };
+  const g = gcd(num, den);
+  return { num: num / g, den: den / g };
+}
+
+/** "3" for whole numbers, "3/4" otherwise. Reduces first. */
+export function formatFraction(f: Fraction): string {
+  const r = reduceFraction(f.num, f.den);
+  return r.den === 1 ? `${r.num}` : `${r.num}/${r.den}`;
+}

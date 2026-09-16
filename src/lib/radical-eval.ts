@@ -6,7 +6,7 @@
 // reduced fraction {num, den} so a negative exponent's answer (e.g. 1/8) is
 // just as checkable as an integer one.
 
-import { gcd, sup, type Lesson, type LevelId, type LevelMeta } from "./levels";
+import { formatFraction, reduceFraction, sup, type Fraction, type Lesson, type LevelId, type LevelMeta } from "./levels";
 
 export type { LevelId };
 
@@ -66,10 +66,7 @@ export const RADICAL_EVAL_LESSONS: Record<LevelId, Lesson> = {
   },
 };
 
-export interface Answer {
-  num: number;
-  den: number;
-}
+export type Answer = Fraction;
 
 export interface Problem {
   id: string;
@@ -81,15 +78,6 @@ export interface Problem {
 
 function randInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function reduceFraction(num: number, den: number): Answer {
-  if (den < 0) {
-    num = -num;
-    den = -den;
-  }
-  const g = gcd(num, den);
-  return { num: num / g, den: den / g };
 }
 
 function radicalSymbol(n: number): string {
@@ -183,8 +171,7 @@ export function checkAnswer(problem: Problem, answer: Answer): boolean {
 }
 
 export function formatAnswer(answer: Answer): string {
-  const a = reduceFraction(answer.num, answer.den);
-  return a.den === 1 ? `${a.num}` : `${a.num}/${a.den}`;
+  return formatFraction(answer);
 }
 
 export type HintStage = 1 | 2 | 3 | 4;

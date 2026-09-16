@@ -5,6 +5,10 @@ import { LEVELS as FACTORING_LEVELS } from "./factoring";
 import { LEVELS as EXPONENT_LEVELS } from "./exponents";
 import { LEVELS as RADICAL_EVAL_LEVELS } from "./radical-eval";
 import { LEVELS as RADICAL_ARITHMETIC_LEVELS } from "./radical-arithmetic";
+import { LEVELS as FACTOR_REMAINDER_LEVELS } from "./factor-remainder";
+import { LEVELS as RATIONAL_EQUATIONS_LEVELS } from "./rational-equations";
+import { LEVELS as ABSOLUTE_VALUE_LEVELS } from "./absolute-value";
+import { LEVELS as QUADRATIC_INEQUALITIES_LEVELS } from "./quadratic-inequalities";
 import type { LevelMeta } from "./levels";
 
 export interface TopicMeta {
@@ -43,6 +47,34 @@ export const TOPICS: TopicMeta[] = [
     title: "Operation: Radical Combat",
     subtitle: "√a + √b, √a · √b, …",
     levels: RADICAL_ARITHMETIC_LEVELS,
+  },
+  {
+    id: "factor-remainder-theorem",
+    href: "/topics/factor-remainder-theorem",
+    title: "Operation: Root Cause",
+    subtitle: "P(a) = 0 → (x − a) is a factor",
+    levels: FACTOR_REMAINDER_LEVELS,
+  },
+  {
+    id: "rational-equations",
+    href: "/topics/rational-equations",
+    title: "Operation: Clear the Denominators",
+    subtitle: "solve for x, watch for extraneous roots",
+    levels: RATIONAL_EQUATIONS_LEVELS,
+  },
+  {
+    id: "absolute-value",
+    href: "/topics/absolute-value",
+    title: "Operation: Absolute Zero",
+    subtitle: "|x − h| = k, |x − h| < k, …",
+    levels: ABSOLUTE_VALUE_LEVELS,
+  },
+  {
+    id: "quadratic-inequalities",
+    href: "/topics/quadratic-inequalities",
+    title: "Operation: Sign Table",
+    subtitle: "(x−r₁)(x−r₂) ≷ 0",
+    levels: QUADRATIC_INEQUALITIES_LEVELS,
   },
 ];
 
