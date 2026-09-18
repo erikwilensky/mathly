@@ -31,10 +31,19 @@ export default function CampaignMapPage() {
   const [streak, setStreak] = useState<DailyStreak | null>(null);
 
   useEffect(() => {
-    const entries: Record<string, TopicProgress> = {};
-    for (const topic of TOPICS) entries[topic.id] = loadTopicProgress(topic.id);
-    setProgressByTopic(entries);
-    setStreak(readDailyStreak());
+    let cancelled = false;
+    Promise.all(TOPICS.map((topic) => loadTopicProgress(topic.id).then((p) => [topic.id, p] as const))).then(
+      (pairs) => {
+        if (cancelled) return;
+        setProgressByTopic(Object.fromEntries(pairs));
+      },
+    );
+    readDailyStreak().then((s) => {
+      if (!cancelled) setStreak(s);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const totalXp = progressByTopic ? Object.values(progressByTopic).reduce((sum, p) => sum + p.xp, 0) : 0;

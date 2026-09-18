@@ -27,21 +27,12 @@ function defaultProgress(): TopicProgress {
 
 export { UNLOCK_THRESHOLD };
 
-function storageKey(topicId: string): string {
-  return `mathly.${topicId}.v1`;
-}
-
-/** Read a topic's progress without subscribing to it as a hook would — for read-only overviews (e.g. the campaign map) that list every topic at once. */
-export function loadTopicProgress(topicId: string): TopicProgress {
-  return load(topicId);
-}
-
-function load(topicId: string): TopicProgress {
-  if (typeof window === "undefined") return defaultProgress();
+/** Read a topic's progress from the DB — for read-only overviews (e.g. the campaign map) that list every topic at once. */
+export async function loadTopicProgress(topicId: string): Promise<TopicProgress> {
   try {
-    const raw = window.localStorage.getItem(storageKey(topicId));
-    if (!raw) return defaultProgress();
-    const parsed = JSON.parse(raw) as TopicProgress;
+    const res = await fetch(`/api/progress/${topicId}`, { cache: "no-store" });
+    if (!res.ok) return defaultProgress();
+    const parsed = (await res.json()) as TopicProgress;
     return { ...defaultProgress(), ...parsed };
   } catch {
     return defaultProgress();
@@ -49,20 +40,28 @@ function load(topicId: string): TopicProgress {
 }
 
 function save(topicId: string, progress: TopicProgress) {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(storageKey(topicId), JSON.stringify(progress));
-  } catch {
-    // localStorage unavailable (private browsing, etc.) — progress just won't persist.
-  }
+  fetch(`/api/progress/${topicId}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(progress),
+  }).catch(() => {
+    // Best-effort — if the save fails, the next successful GET will still
+    // reflect whatever was last persisted; local UI state is unaffected.
+  });
 }
 
-/** topicId keys the localStorage entry, e.g. "factoring-quadratics" — keep it stable per topic or progress resets. */
+/** topicId keys the DB row, e.g. "factoring-quadratics" — keep it stable per topic or progress resets. */
 export function useProgress(topicId: string) {
   const [progress, setProgress] = useState<TopicProgress>(defaultProgress);
 
   useEffect(() => {
-    setProgress(load(topicId));
+    let cancelled = false;
+    loadTopicProgress(topicId).then((loaded) => {
+      if (!cancelled) setProgress(loaded);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [topicId]);
 
   const recordAttempt = useCallback((level: LevelId, correct: boolean) => {

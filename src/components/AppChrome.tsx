@@ -12,7 +12,13 @@ export default function AppChrome() {
 
   useEffect(() => {
     if (pathname === "/unlock") return;
-    setStreak(recordDailyVisit());
+    let cancelled = false;
+    recordDailyVisit().then((s) => {
+      if (!cancelled) setStreak(s);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [pathname]);
 
   if (pathname === "/unlock") return null;
