@@ -58,7 +58,7 @@ export default function RationalEquationsPracticePanel({ level, onResult }: Prop
       const yourAnswer = answer.noSolution ? "No solution" : `x = ${answer.x1.num}${answer.x1.den !== 1 ? `/${answer.x1.den}` : ""}`;
       setFeedback({
         correct: false,
-        message: `${randomOf(INCORRECT_LINES)} You said ${yourAnswer}, but the correct answer is ${formatSolution(problem.solution)}.`,
+        message: `${randomOf(INCORRECT_LINES)} You said ${yourAnswer} — not quite. Grab some intel if you're stuck.`,
       });
     }
   }

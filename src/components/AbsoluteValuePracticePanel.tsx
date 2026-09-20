@@ -67,7 +67,7 @@ export default function AbsoluteValuePracticePanel({ level, onResult }: Props) {
       setLocalStreak(0);
       setFeedback({
         correct: false,
-        message: `${randomOf(INCORRECT_LINES)} You said ${formatAnswer(answer, level)}, but the correct answer is ${formatAnswer(problem.solution, level)}.`,
+        message: `${randomOf(INCORRECT_LINES)} You said ${formatAnswer(answer, level)} — not quite. Grab some intel if you're stuck.`,
       });
     }
   }

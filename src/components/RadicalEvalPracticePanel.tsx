@@ -57,7 +57,7 @@ export default function RadicalEvalPracticePanel({ level, onResult }: Props) {
       setLocalStreak(0);
       setFeedback({
         correct: false,
-        message: `${randomOf(INCORRECT_LINES)} You entered ${formatAnswer(answer)}, but it evaluates to ${formatAnswer(problem.solution)}.`,
+        message: `${randomOf(INCORRECT_LINES)} You entered ${formatAnswer(answer)} — not quite. Grab some intel if you're stuck.`,
       });
     }
   }

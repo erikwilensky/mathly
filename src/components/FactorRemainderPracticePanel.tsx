@@ -57,7 +57,7 @@ export default function FactorRemainderPracticePanel({ level, onResult }: Props)
       setLocalStreak(0);
       setFeedback({
         correct: false,
-        message: `${randomOf(INCORRECT_LINES)} You entered ${formatAnswer(problem, answer)}, but the correct answer is ${formatAnswer(problem, problem.solution)}.`,
+        message: `${randomOf(INCORRECT_LINES)} You entered ${formatAnswer(problem, answer)} — not quite. Grab some intel if you're stuck.`,
       });
     }
   }

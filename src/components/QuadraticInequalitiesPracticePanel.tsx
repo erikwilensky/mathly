@@ -79,7 +79,7 @@ export default function QuadraticInequalitiesPracticePanel({ level, onResult }: 
       setLocalStreak(0);
       setFeedback({
         correct: false,
-        message: `${randomOf(INCORRECT_LINES)} You said ${formatAnswer(answer)}, but the correct answer is ${formatAnswer(problem.solution)}.`,
+        message: `${randomOf(INCORRECT_LINES)} You said ${formatAnswer(answer)} — not quite. Grab some intel if you're stuck.`,
       });
     }
   }

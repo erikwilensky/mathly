@@ -63,7 +63,7 @@ export default function RadicalArithmeticPracticePanel({ level, onResult }: Prop
       setLocalStreak(0);
       setFeedback({
         result,
-        message: `${randomOf(INCORRECT_LINES)} You entered ${formatAnswer(answer)}, but the simplified answer is ${formatAnswer(problem.solution)}.`,
+        message: `${randomOf(INCORRECT_LINES)} You entered ${formatAnswer(answer)} — not quite. Grab some intel if you're stuck.`,
       });
     }
   }
